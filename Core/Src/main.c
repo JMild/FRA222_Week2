@@ -46,6 +46,8 @@ UART_HandleTypeDef huart2;
 
 uint16_t ButtonMatrixState = 0;  // save status of Button Matrix
 uint32_t ButtonMatrixtimestamp = 0;  // Button TimeStamp
+GPIO_TypeDef *CheckID[11] = {0};
+uint16_t count = 0;
 
 /* USER CODE END PV */
 
@@ -104,7 +106,73 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  //function button
+
 	  ButtonMatrixUpdate();
+	  if (ButtonMatrixState == 64) //6
+	  {
+		  count += 1;
+		  CheckID[0] = 6;
+	  }
+	  if (ButtonMatrixState == 512) //2
+	  {
+		  count += 1;
+		  CheckID[1] = 2;
+	  }
+	  if (ButtonMatrixState == 1024) //3
+	  {
+		  count += 1;
+		  CheckID[2] = 3;
+	  }
+	  if (ButtonMatrixState == 16) //4
+	  {
+		  count += 1;
+		  CheckID[3] = 4;
+	  }
+	  if (ButtonMatrixState == 4096) //0
+	  {
+		  count += 1;
+		  if (count = 5)
+		  {
+			  CheckID[4] = 0;
+		  }
+		  if (count = 7)
+		  {
+			  CheckID[6] = 0;
+		  }
+		  if (count = 8)
+		  {
+			  CheckID[4] = 0;
+		  }
+
+
+	  }
+	  if (ButtonMatrixState == 16) //5
+	  {
+		  count += 1;
+		  CheckID[5] = 5;
+	  }
+
+	  // Press OK
+	  if (ButtonMatrixState == -32768)
+	  {
+		  if (count == 11 && CheckID == 62340500056)
+		  {
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+		  }
+		  else
+		  {
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+		  }
+	  }
+
+//		 Press Clear
+//	if (ButtonMatrixState == 8)
+//	{
+//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+//	}
+
+
+
 
   }
   /* USER CODE END 3 */
@@ -292,35 +360,15 @@ void ButtonMatrixUpdate()
 					// shift loop3-(i + 2*4 = 8-11)
 					// shift loop4-(i + 3*4 = 12-15)
 					// (i=3) 0b0000000000000000 | 0b100 ==> 0b0000000000000100
-
-					// Press OK ==> R4,L4
-					if (ButtonMatrixState >> 15 == 0b1)
-					{
-						if (ButtonMatrixState == 0b1001011001110000)
-						{
-							HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-						}
-						else
-						{
-							HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-						}
-					}
-
-					// Press Clear ==> R4,L1
-//					if (ButtonMatrixState && 0b100 == 0b1000)
-//					{
-//						ButtonMatrixData = 0;   // Clear Data
-//						ButtonMatrixState = 0;
-//						ButtonMatrixRow = 0;
-//						HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-//					}
 				}
 
 				else // Button No Press
 				{
-					ButtonMatrixState &= ~((uint16_t)1 <<i); // set bit i ==> 0
+					ButtonMatrixState &= ~((uint16_t)1 << (i + ButtonMatrixRow * 4)); // set bit i ==> 0
 					// (i=3) 0b0000000000000000 | 0b100 ==> 0b1111111111111011
 				}
+
+
 		 }
 
 		 uint8_t NowOutputPin = ButtonMatrixRow + 4;

@@ -44,8 +44,9 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-uint16_t ButtonMatrixState = 0;  // save status of Button Matrix
+uint32_t ButtonMatrixState = 0;  // save status of Button Matrix
 uint32_t ButtonMatrixtimestamp = 0;  // Button TimeStamp
+uint32_t timestamp = 0;
 GPIO_TypeDef *CheckID[11] = {0};
 uint16_t count = 0;
 
@@ -106,74 +107,82 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  //function button
-
 	  ButtonMatrixUpdate();
-	  if (ButtonMatrixState == 64) //6
-	  {
-		  count += 1;
-		  CheckID[0] = 6;
-	  }
-	  if (ButtonMatrixState == 512) //2
-	  {
-		  count += 1;
-		  CheckID[1] = 2;
-	  }
-	  if (ButtonMatrixState == 1024) //3
-	  {
-		  count += 1;
-		  CheckID[2] = 3;
-	  }
-	  if (ButtonMatrixState == 16) //4
-	  {
-		  count += 1;
-		  CheckID[3] = 4;
-	  }
-	  if (ButtonMatrixState == 4096) //0
-	  {
-		  count += 1;
-		  if (count = 5)
+
+	 if (HAL_GetTick() - timestamp >= 500) // check press and switch ขา
+	 {
+		  if (ButtonMatrixState == 64) //6
 		  {
-			  CheckID[4] = 0;
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 6;
+			  count += 1;
 		  }
-		  if (count = 7)
+		  if (ButtonMatrixState == 512) //2
 		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 2;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 1024) //3
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 3;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 16) //4
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 4;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 4096) //0
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 0;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 32) //5
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 5;
+			  count += 1;
+		  }
+
+		  // Press OK
+		  if (ButtonMatrixState == 32768)
+		  {
+			  timestamp = HAL_GetTick();
+			  if (CheckID[0] == 6 && CheckID[1] == 2 && CheckID[2] == 3 && CheckID[3] == 4 && CheckID[4] == 0 && CheckID[5] == 5 &&
+				  CheckID[6] == 0 && CheckID[7] == 0 && CheckID[8] == 0 && CheckID[9] == 5 && CheckID[10] == 6)
+			  {
+				  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+			  }
+			  else
+			  {
+				  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+			  }
+		  }
+
+
+		  // Press Clear
+		if (ButtonMatrixState == 8)
+		{
+			  timestamp = HAL_GetTick();
+			  CheckID[0] = 0;
+			  CheckID[1] = 0;
+			  CheckID[2] = 0;
+			  CheckID[3] = 0;
+			  CheckID[4] = 0;
+			  CheckID[5] = 0;
 			  CheckID[6] = 0;
-		  }
-		  if (count = 8)
-		  {
-			  CheckID[4] = 0;
-		  }
-
-
-	  }
-	  if (ButtonMatrixState == 16) //5
-	  {
-		  count += 1;
-		  CheckID[5] = 5;
-	  }
-
-	  // Press OK
-	  if (ButtonMatrixState == -32768)
-	  {
-		  if (count == 11 && CheckID == 62340500056)
-		  {
-			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-		  }
-		  else
-		  {
+			  CheckID[7] = 0;
+			  CheckID[8] = 0;
+			  CheckID[9] = 0;
+			  CheckID[10] = 0;
+			  count= 0;
 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-		  }
+		}
 	  }
-
-//		 Press Clear
-//	if (ButtonMatrixState == 8)
-//	{
-//		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-//	}
-
-
-
-
   }
   /* USER CODE END 3 */
 }
@@ -345,7 +354,7 @@ uint16_t ButtonMatrixData = 0;
 
 void ButtonMatrixUpdate()
 {
-	 if (HAL_GetTick() - ButtonMatrixtimestamp >= 200) // check press and switch ขา
+	 if (HAL_GetTick() - ButtonMatrixtimestamp >= 50) // check press and switch ขา
 	 {
 		 ButtonMatrixtimestamp = HAL_GetTick();
 		 int i;
@@ -367,8 +376,6 @@ void ButtonMatrixUpdate()
 					ButtonMatrixState &= ~((uint16_t)1 << (i + ButtonMatrixRow * 4)); // set bit i ==> 0
 					// (i=3) 0b0000000000000000 | 0b100 ==> 0b1111111111111011
 				}
-
-
 		 }
 
 		 uint8_t NowOutputPin = ButtonMatrixRow + 4;

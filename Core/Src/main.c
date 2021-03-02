@@ -111,12 +111,18 @@ int main(void)
 
 	 if (HAL_GetTick() - timestamp >= 500) // check press and switch ขา
 	 {
-		  if (ButtonMatrixState == 64) //6
+		 if (ButtonMatrixState == 4096) //0
 		  {
 			  timestamp = HAL_GetTick();
-			  CheckID[count] = 6;
+			  CheckID[count] = 0;
 			  count += 1;
 		  }
+		  if (ButtonMatrixState == 256) //1
+			  {
+				  timestamp = HAL_GetTick();
+				  CheckID[count] = 1;
+				  count += 1;
+			  }
 		  if (ButtonMatrixState == 512) //2
 		  {
 			  timestamp = HAL_GetTick();
@@ -135,16 +141,34 @@ int main(void)
 			  CheckID[count] = 4;
 			  count += 1;
 		  }
-		  if (ButtonMatrixState == 4096) //0
-		  {
-			  timestamp = HAL_GetTick();
-			  CheckID[count] = 0;
-			  count += 1;
-		  }
 		  if (ButtonMatrixState == 32) //5
 		  {
 			  timestamp = HAL_GetTick();
 			  CheckID[count] = 5;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 64) //6
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 6;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 1) //7
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 7;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 2) //8
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 8;
+			  count += 1;
+		  }
+		  if (ButtonMatrixState == 4) //9
+		  {
+			  timestamp = HAL_GetTick();
+			  CheckID[count] = 9;
 			  count += 1;
 		  }
 

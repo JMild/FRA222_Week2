@@ -107,9 +107,9 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  //function button
-	  ButtonMatrixUpdate();
 
-	 if (HAL_GetTick() - timestamp >= 500) // check press and switch ขา
+	  ButtonMatrixUpdate();
+	 if (HAL_GetTick() - timestamp >= 500)
 	 {
 		 if (ButtonMatrixState == 4096) //0
 		  {
@@ -186,7 +186,6 @@ int main(void)
 				  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 			  }
 		  }
-
 
 		  // Press Clear
 		if (ButtonMatrixState == 8)
@@ -360,7 +359,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
 }
 
 /* USER CODE BEGIN 4 */
@@ -373,12 +371,10 @@ uint16_t ButtonMatrixPin[8] =
  GPIO_PIN_9,GPIO_PIN_7,GPIO_PIN_6,GPIO_PIN_7};
 
 uint8_t ButtonMatrixRow = 0; // What R Now
-uint16_t ButtonMatrixData = 0;
-
 
 void ButtonMatrixUpdate()
 {
-	 if (HAL_GetTick() - ButtonMatrixtimestamp >= 50) // check press and switch ขา
+	 if (HAL_GetTick() - ButtonMatrixtimestamp >= 100)
 	 {
 		 ButtonMatrixtimestamp = HAL_GetTick();
 		 int i;
